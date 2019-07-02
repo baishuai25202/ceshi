@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:命名空间：对应的dao接口的名字-->
+<mapper namespace="com.example.demo.mapper.EmpMapper">
+   <sql id="likeEmp">
+      <where>
+         <if test="name !=null and name!=''">
+          and e.ename like concat('%',#{name},'%')
+         </if>
+         <if test="startDate != null and startDate != ''">
+            and e.hiredate &gt; #{startDate}
+         </if>
+         <if test="endDate != null and endDate != ''">
+          and e.hiredate &lt; #{endDate}
+         </if>
+      </where>
+   </sql>
+   <select id="getEmp" resultType="Emp">
+      select e.*,d.dname from emp e left join  dept d on e.deptno=d.deptno
+      <include refid="likeEmp"></include>
+      order by e.empno desc
+   </select>
+   <select id="getCount" resultType="java.lang.Integer">
+      select count(*) from emp
+   </select>
+    <select id="getMenu" resultType="Dept">
+        select * from dept;
+    </select>
+    <insert id="addEmp">
+        insert  into emp(empno,ename,job,sex,deptno,hiredate,roleid)
+        values (0,#{ename},#{job},#{sex},#{deptno},#{hiredate},1);
+    </insert>
+    <select id="updateEmp" resultType="Emp">
+         select e.*,d.dname from emp e left join  dept d on e.deptno=d.deptno where e.empno=#{empno}
+    </select>
+    <update id="endUpdateEmp">
+        update emp set empno=#{empno},job=#{job},sex=#{sex},deptno=#{deptno},hiredate=#{hiredate} where empno=#{empno}
+    </update>
+    <delete id="deleteEmp">
+        delete from emp where empno=#{empno}
+    </delete>
+    <delete id="deleteAllEmp">
+        delete from emp where empno in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

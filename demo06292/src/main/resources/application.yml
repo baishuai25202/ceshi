@@ -1,0 +1,69 @@
+server:
+  port: 8080 #配置访问端口
+  servlet:
+    context-path: /stu #配置访问时的项目名
+
+
+spring:
+  resource:
+    static-locations: classpath:/static/
+  devtools:
+    remote:
+     restart:
+      enabled: true #热加载
+  datasource: #数据源
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/db_studentms?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password: bai123
+
+
+  http:
+    encoding.charset: UTF-8
+    encoding.enable: true
+    encoding.force: true
+    #multipart:
+     # enabled: true
+      #max-file-size: 10MB
+      #max-request-size: 100MB
+
+  jackson:
+     date-format: yyyy-MM-dd
+  time-zone: GMT+8
+
+  tymeleaf:
+    model: HTML5
+    encoding: UTF-8
+    content-type: text/html
+    cache: false
+
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+
+mybatis:
+  mapper-locations: classpath:mapping/*Mapper.xml
+  type-aliases-package: com.example.demo.entity
+logging:
+  level:
+    com:
+     example:
+      demo:
+       mapper: debug
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=coutSql
+
+cors:
+  # 支持的方法类型
+  allowed-methods: POST,GET,DELETE,PUT
+  # 支持的请求头
+  allowed-headers: /stu/
+  # 支持的域名
+  #allowed-origins:
+  # 方法路径
+  path: /**
+  max-age: 1800

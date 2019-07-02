@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<template>
+    <div class="pay">
+
+        <form  action="https://gateway.95516.com/gateway/api/frontTransReq.do" method="post" id="payUniconSubmit">
+            <div v-show="false">
+                <input type="text" v-for="(i, index) in Object.keys(listData)" :key="index" :name="i" v-model="listData[i]">
+            </div>
+            <van-cell title="银联支付" label-position="left" clickable @click="unionPay">
+                <span slot="icon" class="icon-wrap">
+                  <img :src="icon.union">
+                </span>
+                <van-radio name="2" />
+            </van-cell>
+        </form>
+
+    </div>
+</template>
+
+<script>
+
+    data() {
+        return {
+            listData: {}
+        }
+    },
+
+    async mounted() {
+        try {
+            let resp = await this.$axios.$post(payOrder, payData)
+
+            let payload = JSON.parse(resp.payload)
+            if (payload.errCode != 0) {
+                this.$toast.fail({message: payload.errMsg})
+                return
+            }
+            this.listData = payload.bizData
+        } catch (e) {
+            this.$toast.fail({message: '支付失败'})
+        }
+    },
+
+    methods: {
+
+        async unionPay() {
+            //银联支付form表单调转到银联
+            this.channel = '2'
+            this.forbidClickLoading()
+            document.getElementById('payUniconSubmit').submit()
+        },
+
+    },
+
+</script>
+
+</body>
+</html>

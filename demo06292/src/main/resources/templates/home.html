@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="/stu/layui/css/layui.css" rel="stylesheet">
+    <script src="/stu/layui/layui.all.js"></script>
+    <script src="/stu/vue/js/vue.js"></script>
+    <script src="/stu/vue/js/index.js"></script>
+    <script src="/stu/vue/js/axios.js"></script>
+    <link rel="stylesheet" href="/stu/vue/css/index.css">
+</head>
+<body>
+<div id="app">
+    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item>
+            <el-button type="primary" @click="addEmp">添加</el-button>
+        </el-form-item>
+        <el-form-item>
+                <el-button  type="danger" @click="handleAllDelete">删除所有</el-button>
+        </el-form-item>
+
+        <el-form-item label="用户名">
+            <el-input v-model="formInline.name" placeholder="用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="开始时间">
+            <el-date-picker type="date" placeholder="选择日期" v-model="formInline.startDate" style="width: 100%;"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="结束时间">
+            <el-date-picker type="date" placeholder="选择日期" v-model="formInline.endDate" style="width: 100%;"></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="selectEmp">查询</el-button>
+        </el-form-item>
+    </el-form>
+    <template>
+    <el-table :data="tableData"  ref="multipleTable" style="width: 100%"  @selection-change="handleSelectionChange"  tooltip-effect="dark">
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="empno" label="ID" width="180"></el-table-column>
+        <el-table-column prop="ename" label="姓名" width="180"></el-table-column>
+        <el-table-column prop="job" label="工作"></el-table-column>
+        <el-table-column prop="sex" label="性别"></el-table-column>
+        <el-table-column prop="dname" label="部门"></el-table-column>
+        <el-table-column prop="hiredate" label="入职日期"></el-table-column>
+        <el-table-column label="操作">
+            <template slot-scope="scope">
+                <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    </template>
+<!--分页-->
+    <div class="block">
+        <el-pagination  background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="formInline.page"
+                :page-sizes="[5, 10, 15, 20]" :page-size="5" layout="total, sizes, prev, pager, next, jumper" :total="counts">
+        </el-pagination>
+</div>
+    <!--模态框弹框-->
+    <el-dialog title="提示" :visible.sync="centerDialogVisible" width="30%" center>
+        <el-form ref="form" :model="form" label-width="80px">
+            <input type="hidden" name="form.empno" id="empno">
+            <el-form-item label="姓名">
+                <el-input v-model="form.ename"></el-input>
+            </el-form-item>
+            <el-form-item label="工作">
+                <el-input v-model="form.job"></el-input>
+            </el-form-item>
+            <el-form-item label="性别">
+                <el-radio v-model="form.sex" label="男">男</el-radio>
+                <el-radio v-model="form.sex" label="女">女</el-radio>
+            </el-form-item>
+            <el-form-item label="部门">
+                <el-select v-model="form.deptno" placeholder="请选择部门">
+                    <el-option v-for="item in menu" :label="item.dname" :value="item.deptno"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="入职时间">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="form.hiredate" style="width: 100%;"></el-date-picker>
+            </el-form-item>
+            <el-form-item>
+            <el-button @click="close">取 消</el-button>
+            <el-button type="primary" @click="submitEmp">确 定</el-button>
+            </el-form-item>
+        </el-form>
+
+  </span>
+    </el-dialog>
+<script>
+    var app = new Vue({
+       el:"#app",
+       data:{
+           centerDialogVisible:false,
+           tableData: [],
+           multipleSelection: [],
+           menu:[],
+           counts:'',//总数
+           pages:'',//总页数
+           form:{},
+           formInline:{
+               name:'',
+               startDate:'',
+               endDate:'',
+               page:1,
+               count:5,
+           },
+       },
+       methods:{
+           //取消
+           close:function(){
+               app.centerDialogVisible=false;
+               app.form={};
+           },
+           //全选
+           handleSelectionChange:function(val) {
+                   app.multipleSelection=val;
+           },
+           //修改
+           handleEdit:function(index, row) {
+               app.centerDialogVisible=true;
+              axios.get("/stu/login/updateEmp?empno="+row.empno)
+                  .then(function (value) {
+                      app.form=value.data;
+                  })
+           },
+           //删除所有
+           handleAllDelete:function(){
+               var len=[];
+               app.multipleSelection.forEach(function (item) {
+                   len.push(item.empno);
+               })
+               axios.post("/stu/login/deleteAllEmp",len)
+                   .then(function (value) {
+                       app.$message({
+                           message: value.data.msg,
+                           type: 'success'
+                       });
+                       load();
+                   });
+           },
+           //删除
+           handleDelete:function(index, row) {
+               axios.get("/stu/login/deleteEmp?empno="+row.empno)
+                   .then(function (value) {
+                       app.$message({
+                           message: value.data.msg,
+                           type: 'success'
+                       });
+                       load();
+                   });
+           },
+           //查询
+           selectEmp:function () {
+               load();
+           },
+           //添加
+           addEmp:function () {
+               app.centerDialogVisible=true;
+           },
+           handleSizeChange:function(val) {//当前每页个数
+              app.formInline.count=val;
+              this.formInline.page = 1;
+               load();
+           },
+           handleCurrentChange:function(val) {//当前页数
+               app.formInline.page=val;
+               load();
+           },
+           submitEmp:function () {//提交用户
+               app.centerDialogVisible=false;
+               var path="";
+               if (app.form.empno==null ||app.form.empno==""){
+                   path="/stu/login/addEmp";
+               }else{
+                   path="/stu/login/endUpdateEmp";
+               }
+               axios.post(path,app.form)
+                   .then(function (value) {
+                       app.$message({
+                           message: value.data.msg,
+                           type: 'success'
+                       });
+                       load();
+                       app.form={};
+                   });
+           },
+       }
+    });
+    function load(){
+    axios.post("/stu/login/getEmp",app.formInline)
+    .then(function (value) {
+            app.tableData=value.data.list;
+            app.counts=value.data.total;
+            app.pages=value.data.pages;
+    });
+    }
+    axios.post("/stu/login/getMenu")
+        .then(function (value) {
+           app.menu=value.data;
+        });
+    load();
+</script>
+</body>
+</html>

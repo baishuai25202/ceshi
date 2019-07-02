@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="/stu/layui/css/layui.css" rel="stylesheet">
+    <script src="/stu/layui/layui.all.js"></script>
+    <script src="/stu/vue/js/vue.js"></script>
+    <script src="/stu/vue/js/index.js"></script>
+    <script src="/stu/vue/js/axios.js"></script>
+    <link rel="stylesheet" href="/stu/vue/css/index.css">
+</head>
+<body>
+<div id="app">
+    <form method="post" enctype="multipart/form-data" action="/stu/login/excel" >
+        选择一个文件:
+        <input type="file" name="uploadFile" />
+        <input type="submit" value="上传" />
+    </form>
+</div>
+</body>
+<script>
+    var app = new Vue({
+        el:"#app",
+        data:{
+
+        },
+        methods:{
+
+        }
+    });
+</script>
+</html>
