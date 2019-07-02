@@ -95,5 +95,12 @@ public class EmpController {
     public Result excel(){
             return null;
     }
+    /**
+     * gitHub提交测试
+     */
+    @RequestMapping("/gitHub")
+    public String gitHub(){
+        return null;
+    }
 
 }
